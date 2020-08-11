@@ -30,6 +30,18 @@ const routes: Array<RouteConfig> = [
     name: "Register",
     component: () =>
         import("../views/Register.vue")
+  },
+  {
+    path: "/leaderboards",
+    name: "Leaderboards",
+    component: () =>
+        import("../views/Leaderboards.vue")
+  },
+  {
+    path: "/submit",
+    name: "Submit",
+    component: () =>
+        import("../views/Submit.vue")
   }
 ];
 
