@@ -39,8 +39,7 @@
                     :rules="[
                       v => !!v || 'Your time is required',
                       v =>
-                        parseFloat(v).toString() === v ||
-                        'You have to provide a number!'
+                        timeValidated(v) || 'You have to provide a valid time!'
                     ]"
                     required
                   ></v-text-field>
@@ -91,7 +90,7 @@ export default class Submit extends Vue {
   loggedIn = false;
   category = "5x5";
   subCategory = "regular";
-  time: number | null = null;
+  time = "";
   evidenceUrl = "";
   customUsername = "";
   categories = categories;
@@ -131,7 +130,7 @@ export default class Submit extends Vue {
         body: JSON.stringify({
           category: this.category,
           subCategory: this.subCategory,
-          time: Number(this.time),
+          time: this.timeToMillis(this.time),
           evidence: this.evidenceUrl,
           username: this.customUsername
         }),
@@ -141,6 +140,23 @@ export default class Submit extends Vue {
     ).json();
     this.submitted = true;
     this.submittedText = resp.message;
+  }
+  timeValidated(time: string) {
+    return /([0-5]?\d:)?[0-5]?\d.\d\d\d/g.test(time);
+  }
+  timeToMillis(time: string) {
+    const splitMinutes = time.split(":");
+    const splitSeconds = splitMinutes.flatMap(l => l.split("."));
+    const millis = Number(
+      splitSeconds.length > 0 ? splitSeconds[splitSeconds.length - 1] : 0
+    );
+    const seconds = Number(
+      splitSeconds.length > 1 ? splitSeconds[splitSeconds.length - 2] : 0
+    );
+    const minutes = Number(
+      splitSeconds.length > 2 ? splitSeconds[splitSeconds.length - 3] : 0
+    );
+    return minutes * 60000 + seconds * 1000 + millis;
   }
 }
 </script>
