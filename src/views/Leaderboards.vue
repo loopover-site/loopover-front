@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import apiUrl from "@/store/apiUrl";
 import { categories, Category } from "@/store/category";
 
@@ -48,14 +48,20 @@ export default class Leaderboards extends Vue {
     { text: "Evidence", value: "evidence" },
     { text: "Username", value: "username" }
   ];
+  routeCategory = this.$route.params.category;
+  routeSubCategory = this.$route.params.subCategory;
   leaderboardData: Score<Category>[] = [];
   async getData() {
-    return (await fetch(`${apiUrl}leaderboards`)).json();
+    return (
+      await fetch(
+        `${apiUrl}leaderboards${
+          this.routeCategory ? `/${this.routeCategory}` : ""
+        }${this.routeSubCategory ? `/${this.routeSubCategory}` : ""}`
+      )
+    ).json();
   }
   async mounted() {
-    const data = await this.getData();
-    console.log(data);
-    this.leaderboardData = data;
+    this.leaderboardData = await this.getData();
   }
   millisToTime(milliseconds: number) {
     const currentDate = new Date(milliseconds);
@@ -72,6 +78,16 @@ export default class Leaderboards extends Vue {
         ? ""
         : `${minutes}:`
     }${seconds}.${millis}`;
+  }
+  @Watch("$route.params.category")
+  async categoryChanged(category: string) {
+    this.routeCategory = category;
+    this.leaderboardData = await this.getData();
+  }
+  @Watch("$route.params.subCategory")
+  async subCategoryChanged(subCategory: string) {
+    this.routeSubCategory = subCategory;
+    this.leaderboardData = await this.getData();
   }
 }
 </script>

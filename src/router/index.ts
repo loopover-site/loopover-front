@@ -33,6 +33,12 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/leaderboards",
+    name: "Global Leaderboards",
+    component: () =>
+        import("../views/Leaderboards.vue")
+  },
+  {
+    path: "/leaderboards/:category?/:subCategory?",
     name: "Leaderboards",
     component: () =>
         import("../views/Leaderboards.vue")
