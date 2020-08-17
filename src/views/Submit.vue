@@ -31,6 +31,23 @@
                   ></v-select>
 
                   <v-text-field
+                    v-if="subCategory === 'fmc'"
+                    label="Moves"
+                    name="moves"
+                    prepend-icon="mdi-clock"
+                    type="text"
+                    v-model="time"
+                    :rules="[
+                      v => !!v || 'Your movecount is required',
+                      v =>
+                        Number(v).toString() !== v ||
+                        'You have to provide a number!'
+                    ]"
+                    required
+                  ></v-text-field>
+
+                  <v-text-field
+                    v-else
                     label="Time"
                     name="time"
                     prepend-icon="mdi-clock"
@@ -66,6 +83,15 @@
                     :rules="[v => !!v || 'A custom username is required']"
                     required
                   ></v-text-field>
+
+                  <v-text-field
+                    id="notes"
+                    label="Notes"
+                    name="notes"
+                    prepend-icon="mdi-pencil"
+                    type="text"
+                    v-model="notes"
+                  ></v-text-field>
                 </v-form>
               </v-card-text>
               <v-card-actions>
@@ -96,6 +122,10 @@ export default class Submit extends Vue {
   categories = categories;
   submitted = false;
   submittedText = "";
+  notes = "";
+  get movesVsTime() {
+    return this.subCategory === "fmc" ? "Moves" : "Time";
+  }
   async mounted() {
     this.loggedIn = (
       await (
@@ -130,9 +160,13 @@ export default class Submit extends Vue {
         body: JSON.stringify({
           category: this.category,
           subCategory: this.subCategory,
-          time: this.timeToMillis(this.time),
+          time:
+            this.subCategory === "fmc"
+              ? this.time
+              : this.timeToMillis(this.time),
           evidence: this.evidenceUrl,
-          username: this.customUsername
+          username: this.customUsername,
+          notes: this.notes
         }),
         redirect: "follow",
         referrerPolicy: "no-referrer"
